@@ -91,6 +91,33 @@ NETLIFYBLOG=
 NETLIFYNOTES=
 ```
 
+## repo organization
+```
+dagster_home/ (1)
+├── work/
+|   ├── jobs/
+|   ├── ops/
+|   ├── resources/
+|   ├── sql/
+|   ├── repo.py
+├── work_dbt/
+|   ├── analyses/
+|   ├── macros/
+|   ├── models/
+|   ├── seeds/
+|   ├── snapshots/
+|   ├── tests/
+|   ├── dbt_project.yml
+|   ├── profiles.yml
+|   ├── packages.yml
+├── work_tests/
+services/ (2)
+├── dagit.service
+├── dagsterdeamon.service
+```
+
+1. The contents of the folder [dagster_home](dagster_home/) are copied to the pi in /home/dagster/dagster_project/dagster_home.
+2. the services are installed on the rpi. see the readme of that folder for more info.
 
 ## Abbreviations
 - NAS: network attached Storage. in my case a synology machine.
