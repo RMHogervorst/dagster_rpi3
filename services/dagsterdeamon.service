@@ -1,0 +1,14 @@
+[Unit]
+Description=Dagster deamon service, keeps track of time.
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+WorkingDirectory=/home/dagster/dagster_project/dagster_home
+ExecStart=/home/dagster/dagster_project/venv/bin/dagster-daemon run
+Environment="PATH=/home/dagster/dagster_project/venv/bin"
+Environment="DAGSTER_HOME=/opt/dagster/dagster_home"
+
+[Install]
+WantedBy=multi-user.target
