@@ -1,0 +1,12 @@
+work_dbt:
+  target: prod
+  outputs:
+    prod:
+      type: postgres
+      host: "{{ env_var('PG_HOST') }}"
+      user: "{{ env_var('DBTUSER') }}"
+      pass: "{{ env_var('DBTPASSWORD') }}"
+      port: "{{ env_var('PG_PORT')| as_number }}"
+      dbname: "{{ env_var('PG_DATABASE') }}"
+      schema: public
+      threads: 2

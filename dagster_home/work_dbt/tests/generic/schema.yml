@@ -1,0 +1,19 @@
+version: 2
+
+macros:
+  - name: test_column_between_values_incl
+    description: |
+      Test if a column is between two values inclusive.
+      In other words column between 4 and 6 means that values in the column
+      can be 4 5 or 6, but not 7.
+    arguments:
+      - name: model
+        type: string
+        description: This is automatically infered from the schema
+      - name: column_name
+        type: string
+        description: This is automatically infered from the schema
+      - name: low
+        description: lower bound of your column.
+      - name: high
+        description: higher bound of your column.

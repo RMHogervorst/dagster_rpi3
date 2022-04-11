@@ -1,0 +1,110 @@
+version: 2
+
+models:
+  - name: stg_daily_values
+    description: >
+        Contains the values on a day that do not change
+    columns:
+      - name: created_at_DT
+      - name: place
+      - name: lat
+      - name: lon
+      - name: sunrise_at
+      - name: sunset_at
+      - name: min_temp_celcius
+      - name: max_temp_celcius
+      - name: min_feels_like_temp_celcius
+      - name: max_feels_like_temp_celcius
+
+  - name: stg_current_weather
+    description: >
+      Contains the values that do change every 15 minutes
+      Using the naming conventions for this project.
+    columns:
+      - name: created_at_DT
+        description: Derived field of created_at
+      - name: created_at
+        description: Time of data calculation in UTC (timestampz)
+      - name: place
+        description: The place where measurement takes place, usually Delft (character)
+      - name: temp_celcius
+        description: Current temperature, celcius (float)
+      - name: temp_feels_like_celcius
+        description: This temperature parameter accounts for the human perception of weather.(float)
+      - name: temp_celcius_min
+        description: This is minimal currently observed temperature (within large megalopolises and urban areas) (float)
+      - name: temp_celcius_max
+        description: This is maximal currently observed temperature (within large megalopolises and urban areas). (float)
+      - name: humidity_PCT
+        description: Humidity in percentage 1-100 (int)
+      - name: sea_level_pressure_hpa
+        description: Atmospheric pressure (on the sea level, if there is no sea_level or grnd_level data), hPa (float)
+      - name: wind_speed_ms
+        description: Wind speed in meter/sec (float)
+      - name: wind_dir_degree
+        description: Wind direction, degrees (meteorological) (0-260)(int)
+      - name: cloudiness_PCT
+        description:  Cloudiness percentage (1-100) (int)
+
+sources:
+  - name: openweathermap
+    schema: openweathermap
+    database: postgres
+    tables:
+      - name: raw_current_weather
+        description: >
+          Current weather, updated every 15 minutes from 6 through 22
+          with the job load_current_weather.
+          Uses the [current weather API](https://openweathermap.org/current) from
+          openweathermap.
+        tags:
+          - raw
+        meta:
+          loader: "openweathermaploader"
+          loader_url: "<http://rpi3.local:3000/workspace/rpi3work@repo.py/jobs/load_current_weather>"
+        columns:
+          - name: created_at
+            description: Time of data calculation in UTC (timestampz)
+            tests:
+              - unique
+              - not_null
+          - name: place
+            description: The place where measurement takes place, usually Delft (character)
+          - name: lat
+            description: City geo location, latitude
+          - name: lon
+            description: City geo location, longitude
+          - name: sunrise_at
+            description: Sunrise time (UTC, timestamptz)
+          - name: sunset_at
+            description: Sunset time (UTC, timestamptz)
+          - name: temp_celcius
+            description: Current temperature, celcius (float)
+          - name: temp_feels_like_celcius
+            description: This temperature parameter accounts for the human perception of weather.(float)
+          - name: temp_celcius_min
+            description: This is minimal currently observed temperature (within large megalopolises and urban areas) (float)
+          - name: temp_celcius_max
+            description: This is maximal currently observed temperature (within large megalopolises and urban areas). (float)
+          - name: humidity_percent
+            description: Humidity in percentage 1-100 (int)
+            tests:
+              - column_between_values_incl:
+                  low: 0
+                  high: 100
+          - name: sea_level_pressure_hpa
+            description: Atmospheric pressure (on the sea level, if there is no sea_level or grnd_level data), hPa (float)
+          - name: wind_speed_ms
+            description: Wind speed in meter/sec (float)
+          - name: wind_dir_degree
+            description: Wind direction, degrees (meteorological) (0-260)(int)
+            tests:
+              - column_between_values_incl:
+                  low: 0
+                  high: 360
+          - name: cloudiness_percent
+            description:  Cloudiness percentage (1-100) (int)
+            tests:
+              - column_between_values_incl:
+                  low: 0
+                  high: 100
