@@ -1,0 +1,9 @@
+[sqlfluff]
+templater = dbt
+dialect = postgres
+
+[sqlfluff:templater:dbt]
+project_dir = .
+profiles_dir = .
+profile = work_dbt
+target = prod

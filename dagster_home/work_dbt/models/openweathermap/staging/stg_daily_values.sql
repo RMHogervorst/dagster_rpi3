@@ -1,19 +1,19 @@
 select
-  created_at_DT,
-  place,
-  lat,
-  lon,
-  sunrise_at,
-  sunset_at,
-  min(temp_celcius) as min_temp_celcius,
-  max(temp_celcius) as max_temp_celcius,
-  min(temp_feels_like_celcius) as min_feels_like_temp_celcius,
-  max(temp_feels_like_celcius) as max_feels_like_temp_celcius
+    CREATED_AT_DT,
+    PLACE,
+    LAT,
+    LON,
+    SUNRISE_AT,
+    SUNSET_AT,
+    min(TEMP_CELCIUS) as MIN_TEMP_CELCIUS,
+    max(TEMP_CELCIUS) as MAX_TEMP_CELCIUS,
+    min(TEMP_FEELS_LIKE_CELCIUS) as MIN_FEELS_LIKE_TEMP_CELCIUS,
+    max(TEMP_FEELS_LIKE_CELCIUS) as MAX_FEELS_LIKE_TEMP_CELCIUS
 from {{ ref('stg_current_weather') }}
 group by
-  place,
-  created_at_DT,
-  lat,
-  lon,
-  sunrise_at,
-  sunset_at
+    PLACE,
+    CREATED_AT_DT,
+    LAT,
+    LON,
+    SUNRISE_AT,
+    SUNSET_AT
