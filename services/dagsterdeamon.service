@@ -5,6 +5,7 @@ After=multi-user.target
 [Service]
 Type=simple
 Restart=always
+EnvironmentFile=/home/dagster/dagster_project/.env
 WorkingDirectory=/home/dagster/dagster_project/dagster_home
 ExecStart=/home/dagster/dagster_project/venv/bin/dagster-daemon run
 Environment="PATH=/home/dagster/dagster_project/venv/bin"
