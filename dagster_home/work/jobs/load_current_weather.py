@@ -4,9 +4,14 @@ from datetime import datetime
 from typing import Dict
 
 import requests
-from dagster import ScheduleDefinition, job, op
+from dagster import ScheduleDefinition, job, op, SourceAsset, AssetKey, AssetObservation, MetadataValue
 from resources.connectors import openweathermapapikey, postgres_connection
 
+raw_table_key = ["dbt","openweathermap","raw_current_weather"]
+
+raw_current_weather = SourceAsset(
+    key=AssetKey(raw_table_key),
+    description="Raw table that is created with job 'write_current_weather_to_db'")
 
 @op(required_resource_keys={"openweathermapapikey"})
 def retrieve_current_weather(context) -> Dict:
@@ -36,6 +41,13 @@ def write_current_weather_to_db(context, data: Dict) -> None:
     )
     context.log.debug(sqlquery)
     cursor.execute(sqlquery)
+    context.log_event(
+        AssetObservation(
+        asset_key=raw_table_key,
+        # there is no datetime value I can give back so it remains in text.
+        metadata={"last_update": result["created_at"]}
+        )
+    )
     #
 
 

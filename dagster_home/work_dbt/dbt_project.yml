@@ -35,9 +35,9 @@ models:
   work_dbt:
     # Config indicated by + and applies to all files under models/example/
     openweathermap:
-      +materialized: view
       +tags: weather
+      +materialized: view
       +schema: openweathermap
       staging:
         stg_daily_values:
-          +tags: "daily"
+          +materialized: table

@@ -4,6 +4,8 @@ models:
   - name: stg_daily_values
     description: >
         Contains the values on a day that do not change
+    config:
+      tags: daily
     columns:
       - name: created_at_DT
       - name: place
@@ -49,16 +51,16 @@ models:
 sources:
   - name: openweathermap
     schema: openweathermap
+    tags: [weather]
     database: postgres
     tables:
       - name: raw_current_weather
+        tags: [raw]
         description: >
           Current weather, updated every 15 minutes from 6 through 22
           with the job load_current_weather.
           Uses the [current weather API](https://openweathermap.org/current) from
           openweathermap.
-        tags:
-          - raw
         meta:
           loader: "openweathermaploader"
           loader_url: "<http://rpi3.local:3000/workspace/rpi3work@repo.py/jobs/load_current_weather>"

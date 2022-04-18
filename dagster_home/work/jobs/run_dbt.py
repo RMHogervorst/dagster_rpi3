@@ -1,6 +1,16 @@
 from dagster import ScheduleDefinition, job
 from dagster_dbt import dbt_cli_resource, dbt_docs_generate_op
 from ops.dbt import make_run_test_custom
+from dagster_dbt.asset_defs import load_assets_from_dbt_manifest
+
+import os
+import json
+
+DBT_PROJECT_DIR="/Users/roelhogervorst/Documents/projecten/dagster_rpi3/dagster_home/work_dbt"
+
+dbt_assets = load_assets_from_dbt_manifest(
+    manifest_json=json.load(open(os.path.join(DBT_PROJECT_DIR,"target","manifest.json")))
+)
 
 my_dbt_resource = dbt_cli_resource.configured(
     {
@@ -8,6 +18,9 @@ my_dbt_resource = dbt_cli_resource.configured(
         "profiles_dir": "work_dbt/",
     }
 )
+
+
+
 
 ## Daily
 daily_run = make_run_test_custom("tag:daily")
@@ -20,7 +33,7 @@ def dbt_job_tag_daily():
 weekly_run = make_run_test_custom("tag:weekly")
 
 @job(resource_defs={"dbt": my_dbt_resource})
-def dbt_job_weekly_daily():
+def dbt_job_tag_weekly():
     weekly_run()
 
 # schedules

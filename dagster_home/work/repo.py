@@ -1,9 +1,15 @@
-from dagster import repository
+from dagster import repository, AssetGroup
 from jobs.create_tables import create_openweathermap_tables
-from jobs.load_current_weather import current_weather_during_day
-from jobs.run_dbt import dbt_tag_daily, dbt_tag_weekly
+from jobs.load_current_weather import current_weather_during_day, raw_current_weather
+from jobs.run_dbt import dbt_tag_daily, dbt_tag_weekly, dbt_assets
 from jobs.trigger_website_rebuilds import websites_retrigger_schedule
+#from assets import dbt_assets
 
+
+asset_group = AssetGroup(
+    [],#dbt_assets,
+    source_assets=[raw_current_weather]
+ )
 
 @repository
 def rpi3work():
@@ -12,5 +18,6 @@ def rpi3work():
         create_openweathermap_tables,
         websites_retrigger_schedule,
         dbt_tag_daily,
-        dbt_tag_weekly
+        dbt_tag_weekly,
+        asset_group,
     ]
