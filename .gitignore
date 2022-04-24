@@ -1,5 +1,6 @@
 venv/
 .env
+dagster_home/keys
 tmp*
 # Byte-compiled / optimized / DLL files
 __pycache__/
