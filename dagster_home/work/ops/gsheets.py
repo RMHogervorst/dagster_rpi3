@@ -6,13 +6,14 @@ import os
 import gspread
 import pandas as pd
 from dagster import op
-
+from dotenv import load_dotenv
 
 @op(config_schema={"sheetid": str, "sheetnumber": int})
 def get_sheet_data(context) -> pd.DataFrame:
     """download all rows from a sheet
     filelocation is defined with an env variable
     return a dataframe with results"""
+    load_dotenv()
     keylocation = os.environ["gcp_key_loc"]
     gc = auth_gdrive_service_account(filename=keylocation)
     sheetid = context.op_config["sheetid"]
