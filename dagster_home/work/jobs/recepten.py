@@ -29,8 +29,8 @@ def cleanup_recipes(df: pd.DataFrame) -> pd.DataFrame:
     The get_sheet_data operator is generic and doesn't care
     about what it gets. But I know the design of this sheet and so
     I can do some cleaning.
-    Because google sheets can change I think it is wise to check
-    the schema after modification."""
+    Because google sheets can change I think it is wise to validate
+    the schema after modification with pandera."""
     # first row in this case is names.
     df.columns = df.iloc[0]
     # drop the first row (is already the header).

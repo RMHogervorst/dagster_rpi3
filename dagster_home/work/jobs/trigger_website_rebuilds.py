@@ -11,7 +11,10 @@ config = {
 
 @job(config=config, description="Trigger netlify to rebuild websites daily.")
 def trigger_websites():
-    jobs = [trigger_netlify_hook.alias("blog")(), trigger_netlify_hook.alias("notes")()]
+    jobs = [
+    trigger_netlify_hook.alias("blog")(),
+    trigger_netlify_hook.alias("notes")()
+    ]
 
 
 websites_retrigger_schedule = ScheduleDefinition(
