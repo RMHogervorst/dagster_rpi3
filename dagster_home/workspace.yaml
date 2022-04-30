@@ -1,7 +1,7 @@
 load_from:
-  - python_package:
-      package_name: work
-      working_directory: work
-  # - python_file:
-  #     relative_path: work/repo.py
+  # - python_package:
+  #     package_name: work
   #     working_directory: work
+  - python_file:
+      relative_path: work/repo.py
+      working_directory: work

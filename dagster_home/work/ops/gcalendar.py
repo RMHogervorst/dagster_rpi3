@@ -14,7 +14,7 @@ def insert_event(calendar_id, event_dict):
     return event
 
 
-def _create_event_dict(
+def create_event_dict(
     startdatetime,
     enddatetime,
     title=None,
@@ -40,7 +40,7 @@ def _create_event_dict(
         "status": status,
     }
     if title is not None:
-        event_dict["title"] = title
+        event_dict["summary"] = title
 
     if description is not None:
         event_dict["description"] = description
