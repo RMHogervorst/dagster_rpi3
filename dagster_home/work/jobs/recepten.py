@@ -2,49 +2,13 @@ import pandas as pd
 from dagster import op, job, Out, AssetMaterialization
 from ops.gsheets import get_sheet_data
 from ops.gcalendar import insert_event, create_event_dict, read_calendar
-from dagster_pandera import pandera_schema_to_dagster_type
-import pandera as pa
-from pandera.typing import Series
 import zoneinfo
 
 import datetime
 
 
-class Recipes(pa.SchemaModel):
-    """Recipes retrieved from google sheet, modified by this operator."""
 
-    weekdag: Series[str] = pa.Field(description="day of the week, in dutch")
-    datum: Series[str] = pa.Field(description="Date in isoformat %Y-%m-%d")
-    ID: Series[str] = pa.Field(description="ID that refers back to masterlist")
-    maaltijdnaam: Series[str] = pa.Field(
-        description="ID that refers back to masterlist", nullable=True
-    )
-    omschrijving: Series[str] = pa.Field(
-        description="Derived field from masterlist: summary of meal", nullable=True
-    )
-    energie: Series[str] = pa.Field(
-        description="Derived field from masterlist: energy in kilocalories",
-        nullable=True,
-    )
-    eiwitten: Series[str] = pa.Field(
-        description="Derived field from masterlist: protein", nullable=True
-    )
-    vet: Series[str] = pa.Field(
-        description="Derived field from masterlist: fat", nullable=True
-    )
-    koolhydraten: Series[str] = pa.Field(
-        description="Derived field from masterlist: carbohydrates", nullable=True
-    )
-    link: Series[str] = pa.Field(
-        description="Derived field from masterlist: URL to recipe", nullable=True
-    )
-    type: Series[str] = pa.Field(
-        description="Derived field from masterlist: category of meal (pasta, soup, rice, etc.)",
-        nullable=True,
-    )
-
-
-@op(out=Out(dagster_type=pandera_schema_to_dagster_type(Recipes)))
+@op
 def cleanup_recipes(df: pd.DataFrame) -> pd.DataFrame:
     """A helper operator to clean up this sheet.
     The get_sheet_data operator is generic and doesn't care
