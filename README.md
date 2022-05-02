@@ -29,6 +29,7 @@ The 'modern data stack' is usually:
 
 I'm not doing that, this project is the 'smoller data stack'[^2].
 
+[Go to all current results](results.md)
 
 ## Smoll data stack
 ![a mouse balancing on two wheat shoots](nick-fewings--dtKoaHpi9M-unsplash.jpg)
