@@ -1,0 +1,38 @@
+version: 2
+
+sources:
+  - name: recipes
+    schema: recipes
+    tags: [recipes, calendar]
+    database: postgres
+    tables:
+      - name: raw_daily_recipes
+        tags: [raw]
+        description: >
+          Raw table that is created with job 'recept_2_calender'
+        meta:
+          loader: "recepten"
+          loader_url: "<http://rpi3.local3000/workspace/rpi3work@repo.py/jobs/recept_2_calender/>"
+        columns:
+          - name: weekdag
+          - name: datum
+          - name: id
+          - name: maaltijdnaam
+          - name: link
+
+models:
+  - name: stg_daily_recipes
+    description: daily values
+    config:
+      tags: daily
+    columns:
+      - name: weekdag
+        tests:
+          - accepted_values:
+              values: ["ma", "di", "wo", "do","vr", "za","zo"]
+      - name: datum
+        test:
+          - unique
+      - name: id
+      - name: maaltijdnaam
+      - name: link

@@ -1,11 +1,18 @@
 import pandas as pd
-from dagster import op, job, Out, AssetMaterialization
+from dagster import op, job, Out, AssetObservation, SourceAsset, AssetKey
 from ops.gsheets import get_sheet_data
 from ops.gcalendar import insert_event, create_event_dict, read_calendar
+from resources.connectors import postgres_connection_receptenloader
+
 import zoneinfo
 
 import datetime
 
+raw_table_key = ["dbt","recepten", "raw_daily_recipes"]
+
+raw_daily_recipes = SourceAsset(
+    key=AssetKey(raw_table_key),
+    description="Raw table that is created with job 'recept_2_calender'")
 
 
 @op
@@ -79,8 +86,39 @@ def insert_recipes_into_gcal(context, df: pd.DataFrame) -> None:
         )
         insert_event(calendar_id=context.op_config["calendar_id"], event_dict=dict)
 
+@op(required_resource_keys={"warehouse_credentials"})
+def insert_recipes_in_db(context, df: pd.DataFrame) -> None:
+    """write recipes used into db"""
+    context.log.debug(len(df))
+    if len(df) >0:
+        conn = context.resources.warehouse_credentials
+        conn.autocommit = True
+        cursor = conn.cursor()
+        result = df[["weekdag", "datum","ID","maaltijdnaam","link"]]
+        ### this is a really really dumb idea, and vulnerable for sql injections!
+        valuestring = []
+        for row in result.values.tolist():
+            quoterow = ["'" + item + "'" for item in row]
+            valuestring.append( " (" + ", ".join(quoterow) + ") ")
+        sqlquery = """INSERT INTO recipes.raw_daily_recipes ({}
+        ) VALUES {};""".format(
+            ", ".join(list(result.columns)),
+            ", ".join(valuestring)
+            )
+
+        context.log.debug(sqlquery)
+        cursor.execute(sqlquery)
+        context.log_event(
+            AssetObservation(
+            asset_key=raw_table_key,
+            # there is no datetime value I can give back so it remains in text.
+            metadata={"last_update": result["datum"].max()}
+            )
+        )
+
 
 @job(
+    resource_defs={"warehouse_credentials": postgres_connection_receptenloader},
     config={
         "ops": {
             "get_sheet_data": {
@@ -108,6 +146,7 @@ def recept_2_calender():
     cleaned_recipes = cleanup_recipes(future_recipes_df)
     filtered_recipes = remove_days_already_filled(cleaned_recipes)
     insert_recipes_into_gcal(filtered_recipes)
+    insert_recipes_in_db(filtered_recipes)
     # or get the ones for a week
     # check if these dates have recipes already?
     # filter dates

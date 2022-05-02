@@ -23,3 +23,16 @@ def postgres_connection():
         port=os.environ["PG_PORT"],
     )
     return conn
+
+@resource
+def postgres_connection_receptenloader():
+    """Create a postgres connection to the warehouse"""
+    load_dotenv()
+    conn = psycopg2.connect(
+        database=os.environ["PG_DATABASE"],
+        user=os.environ["recepten_user"],
+        password=os.environ["recepten_password"],
+        host=os.environ["PG_HOST"],
+        port=os.environ["PG_PORT"],
+    )
+    return conn
