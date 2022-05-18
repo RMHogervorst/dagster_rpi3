@@ -52,14 +52,53 @@ def test_parse_tracks():
     tracks = parse_tracks(input)
 
     expected= pd.DataFrame({
-    "lat" : [48.9574851, 48.9576003, 48.9577591],
-     "lon": [5.8666369,5.8668417,5.8670052],
+    "lat" : ["48.9574851", "48.9576003", "48.9577591"],
+     "lon": ["5.8666369","5.8668417","5.8670052"],
      "hdop": [8, 6.3,4.3],
      "time":["2021-01-01T08:39:26Z","2021-01-01T08:39:42Z","2021-01-01T08:39:58Z"],
      "ele": [256.3,255.7,255.6],
      "speed":[0.3,0.3,0.3],
      "heading": [None] *3
     })
-    assert tracks["lat"] == expected["lat"]
-    assert tracks["lon"] == expected["lon"]
-    
+    pd.testing.assert_series_equal(tracks["lat"], expected["lat"])
+    pd.testing.assert_series_equal(tracks["lon"], expected["lon"])
+
+def test_parse_tracks_handles_missings():
+    point = """<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+    <gpx version="1.1" creator="OsmAnd 4.0.7" xmlns="http://www.topografix.com/GPX/1/1" xmlns:osmand="https://osmand.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+      <metadata>
+        <name>2021-01-01_10-39example</name>
+      </metadata>
+      <trk>
+        <trkseg>
+        <trkpt lat="48.9577591" lon="5.8670052">
+            <ele>255.6</ele>
+            <time>2021-01-01T08:39:58Z</time>
+            <hdop>4.3</hdop>
+            <extensions>
+              <osmand:heading>204</osmand:heading>
+            </extensions>
+          </trkpt>
+         <trkpt lat="48.95723591" lon="5.9670052">
+             <ele>255.6</ele>
+             <time>2021-01-01T08:40:58Z</time>
+             <hdop>4.3</hdop>
+             <extensions>
+               <osmand:speed>0.3</osmand:speed>
+             </extensions>
+           </trkpt>
+           <trkpt lat="48.95723591" lon="5.9670052">
+               <ele>255.6</ele>
+               <time>2021-01-01T09:40:58Z</time>
+               <hdop>4.2</hdop>
+             </trkpt>
+        </trkseg>
+      </trk>
+    </gpx>"""
+    a='{http://www.topografix.com/GPX/1/1}'
+    input = dictify(fromstring(point))[a+'gpx'][a+"trk"]
+    tracks = parse_tracks(input)
+    assert tracks["speed"][0] is None
+    assert tracks["speed"][1] == "0.3"
+    assert tracks["heading"][0] == "204"
+    assert tracks["heading"][2] is None
