@@ -11,7 +11,7 @@ from dagster import Out, job, op, sensor
 from dotenv import load_dotenv
 
 from ops.gpx import read_gpx_file
-from resources.gpx_writers import csv_file_writer, database_file_writer
+from resources.gpx_writers import database_file_writer
 
 
 @op(out={"track": Out(), "metadata": Out()})

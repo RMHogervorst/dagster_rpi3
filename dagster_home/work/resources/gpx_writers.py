@@ -1,7 +1,8 @@
 import os
 
 import pandas as pd
-import psycopg2
+from sqlalchemy import create_engine
+import urllib.parse
 from dagster import resource
 from dotenv import load_dotenv
 
@@ -9,19 +10,22 @@ SCHEMA = "gps"
 NAME_METADATATABLE = "raw_track_metadata"
 NAME_TRACKTABLE = "raw_tracks"
 
+def q(stuff):
+    return urllib.parse.quote_plus(stuff)
 
 class DatabaseFileWriter:
     """write to database"""
 
     def __init__(self):
         load_dotenv()
-        self.conn = psycopg2.connect(
-            database=os.environ["PG_DATABASE"],
-            user=os.environ["gpxuser"],
-            password=os.environ["gpxpassword"],
-            host=os.environ["PG_HOST"],
-            port=os.environ["PG_PORT"],
-        )
+        database=os.environ["PG_DATABASE"]
+        user=os.environ["gpxuser"]
+        password=os.environ["gpxpassword"]
+        host=os.environ["PG_HOST"]
+        port=os.environ["PG_PORT"]
+        #username:password@host:port/database
+        conn_string = f"postgresql://{q(user)}:{q(password)}@{q(host)}:{q(port)}/{q(database)}"
+        self.conn = create_engine(conn_string)
         self.schema = SCHEMA
         self.metadatatablename = NAME_METADATATABLE
         self.tracktablename = NAME_TRACKTABLE
@@ -67,13 +71,13 @@ class CsvFileWriter:
             os.path.join(self.filelocation, self.schema, self.metadatatablename)
             + ".csv"
         )
-        df.to_csv(path, mode="a", index=False)
+        df.to_csv(path, mode="a", index=False,header = False)
 
     def write_track(self, trackdataframe):
         path = (
             os.path.join(self.filelocation, self.schema, self.tracktablename) + ".csv"
         )
-        trackdataframe.to_csv(path, mode="a", index=False)
+        trackdataframe.to_csv(path, mode="a", index=False,header = False)
 
 
 @resource
